@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدمج الإكسيل والتحليل المؤسسي (Egyptian Awqaf Blueprint Style)</title>
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        blueprint: {
+                            900: '#0A1128',
+                            800: '#131E3E',
+                            700: '#1D2E5B',
+                            600: '#2B417A',
+                            100: '#EEF4FF',
+                            50: '#F4F8FF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- SheetJS (xlsx) v0.20.3 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+        /* Blueprint Grid Background Pattern */
+        body {
+            background-color: #0A1128;
+            background-image: 
+                linear-gradient(to right, rgba(43, 65, 122, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(43, 65, 122, 0.15) 1px, transparent 1px);
+            background-size: 32px 32px;
+            color: #E2E8F0;
+        }
+
+        /* Tech circuit corners effect */
+        .tech-card {
+            position: relative;
+            background: #FFFFFF;
+            border: 2px solid #1D2E5B;
+            box-shadow: 0 10px 25px -5px rgba(10, 17, 40, 0.5);
+            border-radius: 12px;
+            color: #0A1128;
+        }
+        
+        .tech-card::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 10px;
+            height: 10px;
+            background: #059669;
+            border: 2px solid #FFFFFF;
+        }
+        
+        .tech-card::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 10px;
+            height: 10px;
+            background: #D97706;
+            border: 2px solid #FFFFFF;
+        }
+
+        /* Audit Tag Badge Style matching reference slides */
+        .audit-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #DC2626;
+            color: #FFFFFF;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            transform: rotate(-1.5deg);
+            box-shadow: 0 3px 6px rgba(220, 38, 38, 0.3);
+            border-radius: 4px;
+        }
+
+        .gold-audit-tag {
+            background: #D97706;
+            transform: rotate(1.5deg);
+            box-shadow: 0 3px 6px rgba(217, 119, 6, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- 1. Header / Hero Section matching Blueprint aesthetic -->
+    <header class="bg-blueprint-900 border-b-2 border-blueprint-700 sticky top-0 z-40 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 shrink-0 border-2 border-emerald-400">
+                    <i class="fa-solid fa-file-excel text-2xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="audit-tag gold-audit-tag">Blueprint v2026</span>
+                        <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
+                            تطبيق دمج ملفات الإكسيل والتحليل المؤسسي
+                        </h1>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1 font-mono">
+                        Institutional Governance, Asset Optimization, and Local Excel Data Consolidation
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="bg-blueprint-800 border border-blueprint-600 px-4 py-2 rounded-xl flex items-center gap-3 shadow-inner">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+                    <div class="text-xs font-mono">
+                        <span class="text-slate-400 block">System Status:</span>
+                        <span class="text-emerald-300 font-bold">Restructuring Active // Secure RTL Canvas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2.5 max-w-md w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Blueprint Top Summary Grid (4 KPI Cards matching Slide 2 layout) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Card 1 -->
+            <div class="tech-card p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider">Total File Pool</span>
+                    <span class="audit-tag">Audit Tag</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <h3 id="kpiTotalFiles" class="text-3xl font-extrabold font-mono text-blueprint-900">0</h3>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">ملفات مرفوعة</span>
+                </div>
+                <p class="text-xs text-slate-600 border-t border-slate-100 pt-2 font-mono">Pending final audit & reconciliation.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="tech-card p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider">Consolidated Records</span>
+                    <span class="audit-tag gold-audit-tag">Verified Data</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <h3 id="kpiTotalRows" class="text-3xl font-extrabold font-mono text-blueprint-900">0</h3>
+                    <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">إجمالي الصفوف</span>
+                </div>
+                <p class="text-xs text-slate-600 border-t border-slate-100 pt-2 font-mono">Unified Excel schema standards.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="tech-card p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider">Detected Columns</span>
+                    <span class="audit-tag">Schema Map</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <h3 id="kpiTotalCols" class="text-3xl font-extrabold font-mono text-blueprint-900">0</h3>
+                    <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">أعمدة مكتشفة</span>
+                </div>
+                <p class="text-xs text-slate-600 border-t border-slate-100 pt-2 font-mono">Automated header synchronization.</p>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="tech-card p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider">Execution Velocity</span>
+                    <span class="audit-tag gold-audit-tag">100% Local</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <h3 id="kpiVelocity" class="text-3xl font-extrabold font-mono text-emerald-700">6 Sec</h3>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">سرعة المعالجة</span>
+                </div>
+                <p class="text-xs text-slate-600 border-t border-slate-100 pt-2 font-mono">Secure browser engine (SheetJS).</p>
+            </div>
+        </section>
+
+        <!-- Main Workspace Grid: Left File Management (7 cols) + Right Merge & Save Settings (5 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- File Upload & Reorderable Queue -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Dropzone Card -->
+                <div class="tech-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="text-base font-extrabold text-blueprint-900 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blueprint-900 text-white text-xs flex items-center justify-center font-mono">01</span>
+                            رفع وإضافة ملفات الإكسيل (Excel File Pool)
+                        </h2>
+                        <span class="text-xs font-mono bg-slate-100 text-slate-700 px-2.5 py-1 rounded font-bold">.xlsx / .xls / .csv</span>
+                    </div>
+
+                    <div id="dropZone" class="border-2 border-dashed border-slate-300 hover:border-emerald-600 bg-slate-50 hover:bg-emerald-50/30 rounded-xl p-8 text-center transition-all cursor-pointer group">
+                        <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" class="hidden">
+                        <div class="w-14 h-14 rounded-2xl bg-blueprint-900 text-white flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-all shadow-md">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                        </div>
+                        <p class="text-base font-bold text-blueprint-900 mb-1">اسحب وأفلت ملفات الإكسيل هنا</p>
+                        <p class="text-sm text-slate-500 mb-4 font-mono">قم برفع عدة ملفات لدمجها تلقائياً واستخراج التقرير المؤسسي</p>
+                        <button type="button" id="browseBtn" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors">
+                            <i class="fa-solid fa-folder-plus"></i>
+                            <span>تصفح ملفات الجهاز</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reorderable Files List Card -->
+                <div class="tech-card p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <h3 class="text-base font-extrabold text-blueprint-900">قائمة الملفات المرفوعة مرتبة</h3>
+                            <span id="fileCountBadge" class="bg-blueprint-100 text-blueprint-900 border border-blueprint-200 text-xs font-mono font-bold px-2.5 py-0.5 rounded-full">0 ملفات</span>
+                        </div>
+                        <button type="button" id="clearAllBtn" class="hidden text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 font-mono">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>حذف الكل</span>
+                        </button>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyFilesState" class="text-center py-10 px-4 border border-slate-100 rounded-xl bg-slate-50">
+                        <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
+                        <p class="text-sm font-medium text-slate-500">لا توجد ملفات مرفوعة حالياً. ابدأ برفع الملفات لعرض جدول المعاينة.</p>
+                    </div>
+
+                    <!-- File List Container -->
+                    <ul id="fileList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></ul>
+                </div>
+            </div>
+
+            <!-- Merge Settings & Save Location (5 cols) -->
+            <div class="lg:col-span-5 tech-card p-6 space-y-5 sticky top-24">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="text-base font-extrabold text-blueprint-900 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blueprint-900 text-white text-xs flex items-center justify-center font-mono">02</span>
+                        إعدادات الدمج والتقرير ومكان الحفظ
+                    </h2>
+                </div>
+
+                <!-- Merge Mode Radios -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-blueprint-900">هيكل ورقة العمل النهائية:</label>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <label class="relative flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/20">
+                            <input type="radio" name="mergeMode" value="consolidated" checked class="mt-1 text-emerald-600 focus:ring-emerald-500">
+                            <div>
+                                <span class="block text-sm font-bold text-blueprint-900">ورقة عمل واحدة موحدة (Consolidated Sheet)</span>
+                                <span class="block text-xs text-slate-500 mt-0.5">دمج كافة السطور وتوحيد الأعمدة في جدول متكامل.</span>
+                            </div>
+                        </label>
+
+                        <label class="relative flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/20">
+                            <input type="radio" name="mergeMode" value="separate" class="mt-1 text-emerald-600 focus:ring-emerald-500">
+                            <div>
+                                <span class="block text-sm font-bold text-blueprint-900">أوراق عمل مستقلة (Separate Sheets)</span>
+                                <span class="block text-xs text-slate-500 mt-0.5">وضع كل ملف في ورقة عمل مستقلة داخل نفس المصنف.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Advanced Options Checkboxes -->
+                <div class="space-y-2.5">
+                    <label class="block text-sm font-bold text-blueprint-900">خيارات التدقيق وتنظيف البيانات:</label>
+                    
+                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-file-signature text-emerald-600 w-4 text-center"></i>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-700">إضافة عمود "اسم الملف المصدر"</span>
+                        </div>
+                        <input type="checkbox" id="optSourceFile" checked class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500">
+                    </label>
+
+                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-layer-group text-emerald-600 w-4 text-center"></i>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-700">إضافة عمود "اسم الورقة المصدر"</span>
+                        </div>
+                        <input type="checkbox" id="optSourceSheet" checked class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500">
+                    </label>
+
+                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-broom text-emerald-600 w-4 text-center"></i>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-700">تجاهل الصفوف الفارغة وتنظيف المسافات</span>
+                        </div>
+                        <input type="checkbox" id="optCleanData" checked class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500">
+                    </label>
+
+                    <label class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-solid fa-chart-pie text-emerald-600 w-4 text-center"></i>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-700">إنشاء ورقة "Summary Report" للتقرير</span>
+                        </div>
+                        <input type="checkbox" id="optSummaryReport" checked class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500">
+                    </label>
+                </div>
+
+                <!-- Save filename input -->
+                <div class="space-y-2 pt-1 border-t border-slate-100">
+                    <label for="outputFilename" class="block text-sm font-bold text-blueprint-900">اسم ملف التقرير النهائي:</label>
+                    <input type="text" id="outputFilename" value="Institutional_Consolidated_Report_2026.xlsx" dir="ltr" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-mono font-semibold text-blueprint-900 text-right focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20">
+                </div>
+
+                <div class="space-y-2">
+                    <button type="button" id="saveAndMergeBtn" disabled class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-sm sm:text-base shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+                        <i class="fa-solid fa-floppy-disk text-lg"></i>
+                        <span>تحديد مكان الحفظ ودمج الملفات</span>
+                    </button>
+                    <p id="fsSupportHint" class="text-[11px] text-center text-slate-500 font-mono flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-folder-open text-emerald-600"></i>
+                        <span>تفتح نافذة النظام لاختيار مسار ومجلد الحفظ بدقة.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Preview & Institutional Analytics Section -->
+        <section id="previewSection" class="hidden space-y-6 pt-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-blueprint-700 pb-3">
+                <div>
+                    <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column text-emerald-400"></i>
+                        <span>التحليلات المؤسسية والمعاينة الفورية (Institutional Analytics Dashboard)</span>
+                    </h2>
+                    <p class="text-xs text-slate-300 font-mono">تحديث تلقائي للبيانات والملخصات الإحصائية للأعمدة الرقمية</p>
+                </div>
+            </div>
+
+            <!-- Automatic Statistical Summary Table -->
+            <div id="numericSummaryCard" class="hidden tech-card overflow-hidden">
+                <div class="px-6 py-4 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-sm font-extrabold text-blueprint-900 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-emerald-600"></i>
+                        <span>الملخص الإحصائي التلقائي للأعمدة الرقمية (Quantitative Aggregations)</span>
+                    </h3>
+                    <span class="audit-tag gold-audit-tag">Summary Report</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm font-mono">
+                        <thead class="bg-slate-50 text-slate-700 border-b border-slate-200 text-xs">
+                            <tr>
+                                <th class="py-3 px-4 font-bold">اسم العمود الرقمي</th>
+                                <th class="py-3 px-4 font-bold">عدد القيم</th>
+                                <th class="py-3 px-4 font-bold">المجموع (Sum)</th>
+                                <th class="py-3 px-4 font-bold">المتوسط (Average)</th>
+                                <th class="py-3 px-4 font-bold">الحد الأقصى (Max)</th>
+                                <th class="py-3 px-4 font-bold">الحد الأدنى (Min)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="numericSummaryBody" class="divide-y divide-slate-100 text-slate-800"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Interactive Data Preview Table (First 15 Rows) -->
+            <div class="tech-card overflow-hidden">
+                <div class="px-6 py-4 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-sm font-extrabold text-blueprint-900 flex items-center gap-2">
+                        <i class="fa-solid fa-table text-emerald-600"></i>
+                        <span>جدول معاينة البيانات المدمجة (أول 15 صفاً - Live Data Preview)</span>
+                    </h3>
+                    <span id="previewRowBadge" class="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">0 صف</span>
+                </div>
+                <div class="overflow-x-auto max-h-96">
+                    <table class="w-full text-right text-xs sm:text-sm whitespace-nowrap font-mono">
+                        <thead id="previewTableHead" class="bg-slate-200 text-blueprint-900 sticky top-0 z-10 border-b border-slate-300"></thead>
+                        <tbody id="previewTableBody" class="divide-y divide-slate-100 text-slate-800"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blueprint-900 border-t-2 border-blueprint-700 py-6 mt-12 text-center text-xs text-slate-400 font-mono">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>مدمج الإكسيل والتحليل المؤسسي — تصميم هابط مطابق لـ Egyptian Awqaf Blueprint (2026).</p>
+            <p class="text-emerald-400 font-bold">Secure Local Processing // No Cloud Uploads</p>
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        /**
+         * Application State
+         */
+        const state = {
+            files: [],
+            mergedRows: [],
+            headers: [],
+            numericStats: [],
+            draggedIndex: null
+        };
+
+        // DOM References
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const fileList = document.getElementById('fileList');
+        const emptyFilesState = document.getElementById('emptyFilesState');
+        const fileCountBadge = document.getElementById('fileCountBadge');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const saveAndMergeBtn = document.getElementById('saveAndMergeBtn');
+        const outputFilenameInput = document.getElementById('outputFilename');
+        const fsSupportHint = document.getElementById('fsSupportHint');
+
+        // Checkboxes
+        const optSourceFile = document.getElementById('optSourceFile');
+        const optSourceSheet = document.getElementById('optSourceSheet');
+        const optCleanData = document.getElementById('optCleanData');
+        const optSummaryReport = document.getElementById('optSummaryReport');
+
+        // Preview Elements
+        const previewSection = document.getElementById('previewSection');
+        const kpiTotalFiles = document.getElementById('kpiTotalFiles');
+        const kpiTotalRows = document.getElementById('kpiTotalRows');
+        const kpiTotalCols = document.getElementById('kpiTotalCols');
+        const kpiVelocity = document.getElementById('kpiVelocity');
+        const numericSummaryCard = document.getElementById('numericSummaryCard');
+        const numericSummaryBody = document.getElementById('numericSummaryBody');
+        const previewTableHead = document.getElementById('previewTableHead');
+        const previewTableBody = document.getElementById('previewTableBody');
+        const previewRowBadge = document.getElementById('previewRowBadge');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!('showSaveFilePicker' in window)) {
+                fsSupportHint.innerHTML = `
+                    <i class="fa-solid fa-circle-info text-amber-400"></i>
+                    <span>متصفحك سيقوم بتنزيل الملف المدمج تلقائياً إلى مجلد التنزيلات.</span>
+                `;
+            }
+        });
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const styles = {
+                success: 'bg-blueprint-900 text-white border-emerald-500',
+                info: 'bg-blueprint-900 text-white border-blue-500',
+                warning: 'bg-amber-950 text-amber-50 border-amber-500',
+                error: 'bg-rose-950 text-rose-50 border-rose-500'
+            };
+
+            const icons = {
+                success: 'fa-circle-check text-emerald-400',
+                info: 'fa-circle-info text-blue-400',
+                warning: 'fa-triangle-exclamation text-amber-400',
+                error: 'fa-circle-xmark text-rose-400'
+            };
+
+            toast.className = `pointer-events-auto flex items-start gap-3 p-4 rounded-xl border-2 shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0 ${styles[type] || styles.info}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icons[type] || icons.info} mt-0.5 text-base shrink-0"></i>
+                <div class="text-xs sm:text-sm font-medium leading-relaxed flex-1">${message}</div>
+            `;
+
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 5500);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 بايت';
+            const k = 1024;
+            const sizes = ['بايت', 'كيلوبايت', 'ميجابايت'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        browseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-emerald-600', 'bg-emerald-50/20');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-emerald-600', 'bg-emerald-50/20');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-emerald-600', 'bg-emerald-50/20');
+            if (e.dataTransfer.files.length) handleFilesUpload(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFilesUpload(e.target.files);
+                fileInput.value = '';
+            }
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            state.files = [];
+            updateUI();
+            showToast('تم حذف جميع الملفات بنجاح.', 'info');
+        });
+
+        [optSourceFile, optSourceSheet, optCleanData].forEach(el => {
+            el.addEventListener('change', () => {
+                if (state.files.length > 0) computeMergedData();
+            });
+        });
+
+        async function handleFilesUpload(fileListObj) {
+            const validExtensions = ['.xlsx', '.xls', '.csv'];
+            const incomingFiles = Array.from(fileListObj);
+            let addedCount = 0;
+            const startTime = performance.now();
+
+            for (const file of incomingFiles) {
+                const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                if (!validExtensions.includes(ext)) {
+                    showToast(`تم تجاهل "${file.name}" لصيغته غير المدعومة.`, 'warning');
+                    continue;
+                }
+
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
+                    const parsedSheets = [];
+                    let totalRawRows = 0;
+
+                    workbook.SheetNames.forEach(sheetName => {
+                        const ws = workbook.Sheets[sheetName];
+                        const jsonRows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+                        parsedSheets.push({ sheetName, rows: jsonRows });
+                        totalRawRows += jsonRows.length;
+                    });
+
+                    state.files.push({
+                        id: crypto.randomUUID ? crypto.randomUUID() : Date.now() + Math.random().toString(),
+                        name: file.name,
+                        size: file.size,
+                        sheetCount: workbook.SheetNames.length,
+                        totalRawRows,
+                        sheets: parsedSheets
+                    });
+                    addedCount++;
+                } catch (err) {
+                    console.error(err);
+                    showToast(`تعذر قراءة الملف "${file.name}".`, 'error');
+                }
+            }
+
+            const elapsed = ((performance.now() - startTime) / 1000).toFixed(1);
+            kpiVelocity.textContent = `${elapsed} Sec`;
+
+            if (addedCount > 0) {
+                showToast(`تمت إضافة ${addedCount} ملف بنجاح في ${elapsed} ثانية.`, 'success');
+                updateUI();
+            }
+        }
+
+        function removeFile(index) {
+            state.files.splice(index, 1);
+            updateUI();
+        }
+        function moveFileUp(index) {
+            if (index <= 0) return;
+            const t = state.files[index];
+            state.files[index] = state.files[index - 1];
+            state.files[index - 1] = t;
+            updateUI();
+        }
+        function moveFileDown(index) {
+            if (index >= state.files.length - 1) return;
+            const t = state.files[index];
+            state.files[index] = state.files[index + 1];
+            state.files[index + 1] = t;
+            updateUI();
+        }
+
+        function handleDragStart(e, index) {
+            state.draggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        function handleDragOverItem(e) { e.preventDefault(); }
+        function handleDropItem(e, targetIndex) {
+            e.preventDefault();
+            if (state.draggedIndex === null || state.draggedIndex === targetIndex) return;
+            const moved = state.files.splice(state.draggedIndex, 1)[0];
+            state.files.splice(targetIndex, 0, moved);
+            state.draggedIndex = null;
+            updateUI();
+        }
+
+        function updateUI() {
+            const count = state.files.length;
+            fileCountBadge.textContent = `${count} ${count === 1 ? 'ملف' : 'ملفات'}`;
+
+            if (count === 0) {
+                emptyFilesState.classList.remove('hidden');
+                clearAllBtn.classList.add('hidden');
+                fileList.innerHTML = '';
+                saveAndMergeBtn.disabled = true;
+                previewSection.classList.add('hidden');
+                return;
+            }
+
+            emptyFilesState.classList.add('hidden');
+            clearAllBtn.classList.remove('hidden');
+            saveAndMergeBtn.disabled = false;
+
+            fileList.innerHTML = state.files.map((file, index) => `
+                <li draggable="true"
+                    ondragstart="handleDragStart(event, ${index})"
+                    ondragover="handleDragOverItem(event)"
+                    ondrop="handleDropItem(event, ${index})"
+                    class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-500 transition-all group cursor-grab">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="text-xs font-mono font-bold bg-blueprint-900 text-white w-6 h-6 rounded flex items-center justify-center shrink-0">#${index + 1}</span>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-blueprint-900 truncate" title="${file.name}">${file.name}</p>
+                            <div class="flex items-center gap-3 text-xs text-slate-500 font-mono mt-0.5">
+                                <span>${formatFileSize(file.size)}</span>
+                                <span>${file.sheetCount} أوراق عمل</span>
+                                <span class="text-emerald-700 font-bold">${file.totalRawRows.toLocaleString('ar-EG')} صف</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="moveFileUp(${index})" ${index === 0 ? 'disabled' : ''} class="w-7 h-7 rounded text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 disabled:opacity-30 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-arrow-up text-xs"></i>
+                        </button>
+                        <button type="button" onclick="moveFileDown(${index})" ${index === count - 1 ? 'disabled' : ''} class="w-7 h-7 rounded text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 disabled:opacity-30 flex items-center justify-center transition-colors">
+                            <i class="fa-solid fa-arrow-down text-xs"></i>
+                        </button>
+                        <button type="button" onclick="removeFile(${index})" class="w-7 h-7 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors mr-1">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                </li>
+            `).join('');
+
+            computeMergedData();
+        }
+
+        function cleanCellValue(val, shouldClean) {
+            if (!shouldClean) return val;
+            return typeof val === 'string' ? val.replace(/\s+/g, ' ').trim() : val;
+        }
+
+        function computeMergedData() {
+            const addSourceFile = optSourceFile.checked;
+            const addSourceSheet = optSourceSheet.checked;
+            const cleanData = optCleanData.checked;
+
+            const sourceFileCol = 'اسم الملف المصدر';
+            const sourceSheetCol = 'اسم الورقة المصدر';
+
+            const merged = [];
+            const headerSet = new Set();
+            if (addSourceFile) headerSet.add(sourceFileCol);
+            if (addSourceSheet) headerSet.add(sourceSheetCol);
+
+            state.files.forEach(file => {
+                file.sheets.forEach(sheet => {
+                    sheet.rows.forEach(rawRow => {
+                        const processedRow = {};
+                        let hasData = false;
+
+                        Object.keys(rawRow).forEach(k => {
+                            const ck = cleanData ? k.replace(/\s+/g, ' ').trim() : k.trim();
+                            if (!ck || ck.startsWith('__EMPTY')) return;
+                            const cv = cleanCellValue(rawRow[k], cleanData);
+                            if (cv !== '' && cv !== null && cv !== undefined) hasData = true;
+                            headerSet.add(ck);
+                            processedRow[ck] = cv;
+                        });
+
+                        if (cleanData && !hasData) return;
+                        if (addSourceFile) processedRow[sourceFileCol] = file.name;
+                        if (addSourceSheet) processedRow[sourceSheetCol] = sheet.sheetName;
+                        merged.push(processedRow);
+                    });
+                });
+            });
+
+            const headers = Array.from(headerSet);
+            const normalizedRows = merged.map(row => {
+                const full = {};
+                headers.forEach(h => full[h] = row[h] !== undefined ? row[h] : '');
+                return full;
+            });
+
+            const numericStats = [];
+            headers.forEach(col => {
+                if (col === sourceFileCol || col === sourceSheetCol) return;
+                let numbers = [], nonEmpty = 0;
+                normalizedRows.forEach(r => {
+                    const v = r[col];
+                    if (v !== '' && v !== null && v !== undefined && typeof v !== 'boolean' && !(v instanceof Date)) {
+                        nonEmpty++;
+                        const num = typeof v === 'number' ? v : parseFloat(String(v).replace(/,/g, ''));
+                        if (!isNaN(num) && isFinite(num)) numbers.push(num);
+                    }
+                });
+                if (numbers.length > 0 && nonEmpty > 0 && (numbers.length / nonEmpty) >= 0.5) {
+                    const sum = numbers.reduce((a, b) => a + b, 0);
+                    numericStats.push({
+                        column: col,
+                        count: numbers.length,
+                        sum,
+                        avg: sum / numbers.length,
+                        max: Math.max(...numbers),
+                        min: Math.min(...numbers)
+                    });
+                }
+            });
+
+            state.mergedRows = normalizedRows;
+            state.headers = headers;
+            state.numericStats = numericStats;
+
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            previewSection.classList.remove('hidden');
+            kpiTotalFiles.textContent = state.files.length.toLocaleString('ar-EG');
+            kpiTotalRows.textContent = state.mergedRows.length.toLocaleString('ar-EG');
+            kpiTotalCols.textContent = state.headers.length.toLocaleString('ar-EG');
+
+            if (state.numericStats.length > 0) {
+                numericSummaryCard.classList.remove('hidden');
+                numericSummaryBody.innerHTML = state.numericStats.map(stat => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4 font-bold text-blueprint-900">${stat.column}</td>
+                        <td class="py-3 px-4 text-slate-600">${stat.count.toLocaleString('ar-EG')}</td>
+                        <td class="py-3 px-4 font-bold text-emerald-700">${stat.sum.toLocaleString('ar-EG', { maximumFractionDigits: 2 })}</td>
+                        <td class="py-3 px-4 text-slate-700">${stat.avg.toLocaleString('ar-EG', { maximumFractionDigits: 2 })}</td>
+                        <td class="py-3 px-4 text-emerald-600 font-semibold">${stat.max.toLocaleString('ar-EG', { maximumFractionDigits: 2 })}</td>
+                        <td class="py-3 px-4 text-slate-600">${stat.min.toLocaleString('ar-EG', { maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `).join('');
+            } else {
+                numericSummaryCard.classList.add('hidden');
+            }
+
+            const previewSlice = state.mergedRows.slice(0, 15);
+            previewRowBadge.textContent = `عرض ${previewSlice.length} من ${state.mergedRows.length.toLocaleString('ar-EG')} صف`;
+
+            previewTableHead.innerHTML = `
+                <tr>
+                    <th class="py-3 px-4 font-bold text-slate-600 w-12">#</th>
+                    ${state.headers.map(h => `<th class="py-3 px-4 font-bold">${h}</th>`).join('')}
+                </tr>
+            `;
+
+            previewTableBody.innerHTML = previewSlice.map((row, idx) => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-2.5 px-4 text-slate-400 font-mono text-xs">${idx + 1}</td>
+                    ${state.headers.map(h => {
+                        let val = row[h];
+                        if (val instanceof Date) val = val.toLocaleDateString('ar-EG');
+                        return `<td class="py-2.5 px-4 max-w-xs truncate" title="${val}">${val !== '' ? val : '-'}</td>`;
+                    }).join('')}
+                </tr>
+            `).join('');
+        }
+
+        function buildFinalWorkbook() {
+            const wb = XLSX.utils.book_new();
+            wb.Workbook = { Views: [{ RTL: true }] };
+
+            const mergeMode = document.querySelector('input[name="mergeMode"]:checked').value;
+            const generateReport = optSummaryReport.checked;
+            const cleanData = optCleanData.checked;
+            const addSourceSheet = optSourceSheet.checked;
+
+            if (generateReport) {
+                const nowStr = new Date().toLocaleString('ar-EG');
+                const reportRows = [
+                    ['التقرير المؤسسي المجمّع - Egyptian Awqaf Blueprint Standards'],
+                    ['تاريخ ووقت الإصدار:', nowStr],
+                    ['إجمالي الملفات المدمجة:', state.files.length],
+                    ['إجمالي السجلات (الصفوف):', state.mergedRows.length],
+                    ['إجمالي الأعمدة المكتشفة:', state.headers.length],
+                    [],
+                    ['أولاً: تفاصيل الملفات المصدرية المدمجة'],
+                    ['الترتيب', 'اسم الملف', 'الحجم', 'أعدد الأوراق', 'إجمالي الصفوف الخام']
+                ];
+
+                state.files.forEach((f, idx) => {
+                    reportRows.push([idx + 1, f.name, formatFileSize(f.size), f.sheetCount, f.totalRawRows]);
+                });
+
+                reportRows.push([]);
+                reportRows.push(['ثانياً: الملخص الإحصائي للأعمدة الرقمية']);
+                if (state.numericStats.length > 0) {
+                    reportRows.push(['اسم العمود', 'عدد القيم', 'المجموع', 'المتوسط', 'الحد الأقصى', 'الحد الأدنى']);
+                    state.numericStats.forEach(s => {
+                        reportRows.push([s.column, s.count, Number(s.sum.toFixed(2)), Number(s.avg.toFixed(2)), Number(s.max.toFixed(2)), Number(s.min.toFixed(2))]);
+                    });
+                } else {
+                    reportRows.push(['لا توجد أعمدة رقمية قابلة للتحليل الإحصائي.']);
+                }
+
+                const summarySheet = XLSX.utils.aoa_to_sheet(reportRows);
+                summarySheet['!views'] = [{ rightToLeft: true }];
+                XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary Report');
+            }
+
+            if (mergeMode === 'consolidated') {
+                const ws = XLSX.utils.json_to_sheet(state.mergedRows, { header: state.headers });
+                ws['!views'] = [{ rightToLeft: true }];
+                XLSX.utils.book_append_sheet(wb, ws, 'البيانات المجمعة');
+            } else {
+                const used = new Set(['Summary Report']);
+                state.files.forEach((file, index) => {
+                    let fileRows = [];
+                    file.sheets.forEach(s => {
+                        s.rows.forEach(rawRow => {
+                            const rowObj = {};
+                            let hasData = false;
+                            Object.keys(rawRow).forEach(k => {
+                                const ck = cleanData ? k.replace(/\s+/g, ' ').trim() : k.trim();
+                                if (!ck || ck.startsWith('__EMPTY')) return;
+                                const cv = cleanCellValue(rawRow[k], cleanData);
+                                if (cv !== '' && cv !== null && cv !== undefined) hasData = true;
+                                rowObj[ck] = cv;
+                            });
+                            if (cleanData && !hasData) return;
+                            if (addSourceSheet) rowObj['اسم الورقة المصدر'] = s.sheetName;
+                            fileRows.push(rowObj);
+                        });
+                    });
+
+                    if (fileRows.length === 0) return;
+                    let base = file.name.replace(/\.[^/.]+$/, '').replace(/[:\\/?*\[\]]/g, '_').trim() || `ملف_${index + 1}`;
+                    let name = base.substring(0, 28);
+                    let c = 1;
+                    while (used.has(name)) name = `${base.substring(0, 25)}_${c++}`;
+                    used.add(name);
+
+                    const ws = XLSX.utils.json_to_sheet(fileRows);
+                    ws['!views'] = [{ rightToLeft: true }];
+                    XLSX.utils.book_append_sheet(wb, ws, name);
+                });
+            }
+
+            return wb;
+        }
+
+        saveAndMergeBtn.addEventListener('click', async () => {
+            if (state.files.length === 0) return;
+
+            const rawName = outputFilenameInput.value.trim() || 'Institutional_Consolidated_Report_2026.xlsx';
+            const finalFileName = rawName.toLowerCase().endsWith('.xlsx') ? rawName : `${rawName}.xlsx`;
+
+            const btnHTML = saveAndMergeBtn.innerHTML;
+            saveAndMergeBtn.disabled = true;
+            saveAndMergeBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i><span>جاري معالجة وتصدير التقرير...</span>`;
+
+            try {
+                const wb = buildFinalWorkbook();
+                const array = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([array], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        const handle = await window.showSaveFilePicker({
+                            suggestedName: finalFileName,
+                            types: [{
+                                description: 'Excel Spreadsheet',
+                                accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                            }]
+                        });
+                        const writable = await handle.createWritable();
+                        await writable.write(blob);
+                        await writable.close();
+                        showToast(`تم حفظ التقرير بنجاح باسم "${handle.name}" في المجلد المختار!`, 'success');
+                        return;
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            showToast('تم إلغاء عملية حفظ الملف.', 'info');
+                            return;
+                        }
+                    }
+                }
+
+                XLSX.writeFile(wb, finalFileName);
+                showToast(`تم دمج الملفات وتنزيل "${finalFileName}" بنجاح!`, 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('حدث خطأ أثناء تصدير ملف الإكسيل.', 'error');
+            } finally {
+                saveAndMergeBtn.disabled = false;
+                saveAndMergeBtn.innerHTML = btnHTML;
+            }
+        });
+    </script>
+</body>
+</html>
